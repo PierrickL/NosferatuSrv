@@ -30,9 +30,11 @@ public class ChatServer
 			System.exit(-1);
 		}
 		System.out.println("Now listening on port " + this.port + ".");
-		this.listen();
 	}
 	
+	/**
+	 * Endless Loop that accepts connection & creates threads
+	 */
 	public void listen()
 	{
 		for(;;)
@@ -52,6 +54,10 @@ public class ChatServer
 		}
 	}
 	
+	/**
+	 * Removing the socket s from the broadcasting list
+	 * @param s
+	 */
 	public void removeConnection(Socket s)
 	{
 		this.outputs.remove(s);
@@ -84,5 +90,6 @@ public class ChatServer
 	public static void main(String args[])
 	{
 		ChatServer srv = new ChatServer();
+		srv.listen();
 	}
 }

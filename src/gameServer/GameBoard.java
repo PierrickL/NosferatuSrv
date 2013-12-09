@@ -22,6 +22,10 @@ public class GameBoard
 	public static final String COMPONENT = "nosferatu_component"; //15
 	public static final String BITE = "nosferatu_bite"; // 16
 	
+	/*
+	 * Player Action Constants
+	 */
+	public static final String DRAW = "PA_DRAWCARDS";
 	
 	/**
 	 * We're assuming we're only playing with 5 players

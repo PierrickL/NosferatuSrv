@@ -11,6 +11,7 @@ public class GameSrv
 	private int port;
 	private ServerSocket sSock;
 	private HashMap<Socket, DataOutputStream> outputs;
+	private GameBoard board;
 
 	public GameSrv()
 	{
@@ -27,49 +28,49 @@ public class GameSrv
 			System.exit(-1);
 		}
 		System.out.println("Now listening on port " + this.port + ".");
-		this.listen();
+		this.board = new GameBoard();
 	}
 
+	/**
+	 * Endless Loop that accepts connection & creates threads
+	 */
 	public void listen()
 	{
 		for (;;)
 		{
 			try
 			{
+				Socket newSocket = this.sSock.accept();
+				DataOutputStream outputStream = new DataOutputStream(
+						newSocket.getOutputStream());
+				System.out.println("Connection from "
+						+ newSocket.getInetAddress().toString() + " !");
+				
 				//Max # of players = 5
 				if(getPlayerCount() < 5)
 				{
-					Socket newSocket = this.sSock.accept();
-					DataOutputStream outputStream = new DataOutputStream(
-							newSocket.getOutputStream());
 					this.outputs.put(newSocket, outputStream);
-					System.out.println("Connection from "
-							+ newSocket.getInetAddress().toString() + " !");
 					GameServerThread sThread = new GameServerThread(this, newSocket);
 					String msg = "ONLINE_PLAYER=";
 					msg += getPlayerCount();
 					this.sendToAll(msg);
 				}else
 				{
-					Socket newSocket = this.sSock.accept();
-					DataOutputStream outputStream = new DataOutputStream(
-							newSocket.getOutputStream());
-					System.out.println("Connection from "
-							+ newSocket.getInetAddress().toString() + " !");
 					System.out.println("Server is full -> rejecting.");
 					outputStream.writeUTF("ERROR_SRV_IS_FULL");
 					newSocket.close();
 				}
-				
-				
 			} catch (IOException e)
 			{
 				e.printStackTrace();
 			}
-
 		}
 	}
 
+	/**
+	 * Removing the socket s from the broadcasting list
+	 * @param s
+	 */
 	public void removeConnection(Socket s)
 	{
 		this.outputs.remove(s);
@@ -103,9 +104,15 @@ public class GameSrv
 			}
 		}
 	}
+	
+	public GameBoard getGameBorBoard()
+	{
+		return this.board;
+	}
 
 	public static void main(String args[])
 	{
 		GameSrv srv = new GameSrv();
+		srv.listen();
 	}
 }
