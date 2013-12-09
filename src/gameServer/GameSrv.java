@@ -36,13 +36,32 @@ public class GameSrv
 		{
 			try
 			{
-				Socket newSocket = this.sSock.accept();
-				DataOutputStream outputStream = new DataOutputStream(
-						newSocket.getOutputStream());
-				this.outputs.put(newSocket, outputStream);
-				System.out.println("Connection from "
-						+ newSocket.getInetAddress().toString() + " !");
-				GameServerThread sThread = new GameServerThread(this, newSocket);
+				//Max # of players = 5
+				if(getPlayerCount() < 5)
+				{
+					Socket newSocket = this.sSock.accept();
+					DataOutputStream outputStream = new DataOutputStream(
+							newSocket.getOutputStream());
+					this.outputs.put(newSocket, outputStream);
+					System.out.println("Connection from "
+							+ newSocket.getInetAddress().toString() + " !");
+					GameServerThread sThread = new GameServerThread(this, newSocket);
+					String msg = "ONLINE_PLAYER=";
+					msg += getPlayerCount();
+					this.sendToAll(msg);
+				}else
+				{
+					Socket newSocket = this.sSock.accept();
+					DataOutputStream outputStream = new DataOutputStream(
+							newSocket.getOutputStream());
+					System.out.println("Connection from "
+							+ newSocket.getInetAddress().toString() + " !");
+					System.out.println("Server is full -> rejecting.");
+					outputStream.writeUTF("ERROR_SRV_IS_FULL");
+					newSocket.close();
+				}
+				
+				
 			} catch (IOException e)
 			{
 				e.printStackTrace();
@@ -66,7 +85,7 @@ public class GameSrv
 
 	public int getPlayerCount()
 	{
-		return -1;
+		return this.outputs.size();
 	}
 
 	public void sendToAll(String message)
