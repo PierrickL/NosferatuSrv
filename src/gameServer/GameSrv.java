@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Random;
+import java.util.Set;
 
 public class GameSrv
 {
@@ -109,6 +111,44 @@ public class GameSrv
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	/**
+	 * Assigning player roles ; should only be called when the server is full
+	 */
+	public void definePlayerRoles()
+	{
+//		Retrieve all players
+		Set<Player> playerSet = outputs.keySet();
+		Object players[];
+		players = playerSet.toArray();
+		
+//		Shuffle the array
+		int n = players.length;
+		Random r = new Random();
+		int j;
+		Object temp;
+		for(int i = 0; i < n; i++)
+		{
+			j = r.nextInt(n-1);
+			temp = players[i];
+			players[i] = players[j];
+			players[j] = players[i];
+		}
+		
+//		Assign roles
+		Player p = null;
+		temp = (Player)players[0];
+		p.setRole(GameBoard.RENFILED);
+		
+		temp = (Player)players[1];
+		p.setRole(GameBoard.VAMPIRE);
+		
+		for(int i = 2; i < n; i++)
+		{
+			temp = (Player)players[i];
+			p.setRole(GameBoard.HUNTER);
 		}
 	}
 	
