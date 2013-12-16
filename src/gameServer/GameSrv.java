@@ -10,14 +10,16 @@ public class GameSrv
 {
 	private int port;
 	private ServerSocket sSock;
-	private HashMap<Socket, DataOutputStream> outputs;
+	//private HashMap<Socket, DataOutputStream> outputs;
+	private HashMap<Player, DataOutputStream> outputs;
 	private GameBoard board;
 
 	public GameSrv()
 	{
 		System.out.println("Starting Game server...");
 		this.port = 27002;
-		this.outputs = new HashMap<Socket, DataOutputStream>();
+//		this.outputs = new HashMap<Socket, DataOutputStream>();
+		this.outputs = new HashMap<Player, DataOutputStream>();
 		try
 		{
 			this.sSock = new ServerSocket(this.port);
@@ -49,8 +51,11 @@ public class GameSrv
 				//Max # of players = 5
 				if(getPlayerCount() < 5)
 				{
-					this.outputs.put(newSocket, outputStream);
-					GameServerThread sThread = new GameServerThread(this, newSocket);
+					//this.outputs.put(newSocket, outputStream);
+					Player p = new Player(newSocket);
+					this.outputs.put(p, outputStream);
+					//GameServerThread sThread = new GameServerThread(this, newSocket);
+					GameServerThread sThread = new GameServerThread(this, p);
 					String msg = "ONLINE_PLAYER=";
 					msg += getPlayerCount();
 					this.sendToAll(msg);
@@ -71,11 +76,13 @@ public class GameSrv
 	 * Removing the socket s from the broadcasting list
 	 * @param s
 	 */
-	public void removeConnection(Socket s)
+	//public void removeConnection(Socket s)
+	public void removeConnection(Player p)
 	{
-		this.outputs.remove(s);
+		this.outputs.remove(p);
 		try
 		{
+			Socket s = p.getSocket();
 			s.close();
 		} catch (IOException e)
 		{

@@ -16,6 +16,8 @@ public class GameBoard
 	public static final int MAX_CLOCK_SIZE = 6;
 	public static final int MAX_LIBRARY_SIZE = 54; 
 	public static final String RENFILED = "nosferatu_renfield";
+	public static final String VAMPIRE = "nosferatu_vampire";
+	public static final String HUNTER = "nosferatu_hunter";	
 	public static final String DAWN = "nosferatu_dawn"; // 1
 	public static final String NIGHT = "nosferatu_night"; // 1 per player + (10 - #Players) in the library 
 	public static final String RUMOR = "nosferatu_rumor"; // 18
@@ -26,6 +28,9 @@ public class GameBoard
 	 * Player Action Constants
 	 */
 	public static final String DRAW = "PA_DRAWCARDS";
+	
+	///TODO : Attribute roles => Player Array => Shuffle => #1 = Renfiled ; #2 = Vamp
+	
 	
 	/**
 	 * We're assuming we're only playing with 5 players
