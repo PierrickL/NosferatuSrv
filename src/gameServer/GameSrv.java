@@ -3,6 +3,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
@@ -22,6 +23,7 @@ public class GameSrv
 		this.port = 27002;
 //		this.outputs = new HashMap<Socket, DataOutputStream>();
 		this.outputs = new HashMap<Player, DataOutputStream>();
+		
 		try
 		{
 			this.sSock = new ServerSocket(this.port);

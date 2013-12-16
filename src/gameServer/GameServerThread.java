@@ -17,7 +17,7 @@ public class GameServerThread extends Thread
 	public GameServerThread(GameSrv srv,Player p)
 	{
 //		this.sock = s;
-		this.p= p;
+		this.p = p;
 		this.srv = srv;
 		Socket sock;
 		sock = p.getSocket();
@@ -49,15 +49,18 @@ public class GameServerThread extends Thread
 				///TODO : add some log'ing function
 //				System.out.println(this.sock.getInetAddress().toString() + " : " + msg);
 				System.out.println(s.getInetAddress().toString() + " : " + msg);
-				if(!msg.contains("com.cs385.chatclient.HELLO_MSG"))
-				{
-					// Examinating all the cases : Requests from client
-					if(msg.contains(GameBoard.DRAW))
-					{
-						playerDraw();
-					}
-				}
 				
+				//set the player name
+				if(msg.contains("PLAYER_NAME"))
+				{
+					this.p.setName(msg.split("=")[1]);
+					
+				}
+				// Examinating all the cases : Requests from client
+				if(msg.contains(GameBoard.DRAW))
+				{
+					playerDraw();
+				}
 			}
 		} catch (IOException e)
 		{

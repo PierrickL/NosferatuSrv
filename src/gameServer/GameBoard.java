@@ -79,7 +79,7 @@ public class GameBoard
 	}
 	
 	/**
-	 * Suffles the cards
+	 * Shuffles the cards
 	 */
 	private void shuffle(ArrayList<String>array)
 	{

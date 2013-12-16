@@ -28,11 +28,15 @@ public class ChatServerThread extends Thread
 				msg = input.readUTF();
 				///TODO : add some log'ing function
 				System.out.println(this.sock.getInetAddress().toString() + " : " + msg);
-				if(!msg.contains("com.cs385.chatclient.HELLO_MSG"))
+				if(!msg.contains("PLAYER_NAME"))
 				{
 					this.srv.sendToAll(msg);
+				}else
+				{
+					String temp;
+					temp = msg.split("=")[1] + " has joined the conversation.";
+					this.srv.sendToAll(temp);
 				}
-				
 			}
 		} catch (IOException e)
 		{
