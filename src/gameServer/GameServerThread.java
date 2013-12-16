@@ -61,6 +61,31 @@ public class GameServerThread extends Thread
 				{
 					playerDraw();
 				}
+				if(msg.contains(GameBoard.KILL))
+				{
+					String toBeKilled = msg.split("=")[1];
+					String role = this.srv.getRoleByName(toBeKilled);
+					
+					if(role.equals(GameBoard.VAMPIRE))
+					{
+						///TODO : Hunters win
+						String winMSG;
+						winMSG = GameBoard.VICTORY + ";" + GameBoard.HUNTER;
+						this.srv.sendToAll(winMSG);
+					}
+				}
+				if(msg.contains("PA_BITE"))
+				{
+					GameBoard b = this.srv.getGameBorBoard();
+					b.bite();
+					if(b.getBiteCount() >= 5)
+					{
+						// Vampires win
+						String winMSG;
+						winMSG = GameBoard.VICTORY + ";" + GameBoard.VAMPIRE;
+						this.srv.sendToAll(winMSG);
+					}
+				}
 			}
 		} catch (IOException e)
 		{

@@ -154,6 +154,28 @@ public class GameSrv
 		}
 	}
 	
+	/**
+	 * Retrieves the role of a particular player
+	 * @param playerName
+	 * @return
+	 */
+	public String getRoleByName(String playerName)
+	{
+		Set<Player> pSet= outputs.keySet();
+		String role = null;
+		for(Player p : pSet)
+		{
+			if(p.getName().equals(playerName))
+			{
+				role = p.getRole();
+				break;
+			}
+		}
+		
+		return role;
+	}
+
+	
 	public GameBoard getGameBorBoard()
 	{
 		return this.board;

@@ -8,6 +8,7 @@ public class GameBoard
 	private ArrayList<String> clock; //horloge
 	private ArrayList<String> discard; //défausse
 	private ArrayList<String> library; //pioche
+	private int biteCount;
 	
 	/*
 	 * Game constants
@@ -28,8 +29,10 @@ public class GameBoard
 	 * Player Action Constants
 	 */
 	public static final String DRAW = "PA_DRAWCARDS";
-	
-	///TODO : Attribute roles => Player Array => Shuffle => #1 = Renfiled ; #2 = Vamp
+	public static final String KILL = "PA_KILL";
+	public static final String PBITE = "PA_BITE";// whenever a player plays a bite card
+	public static final String VICTORY = "nosferatu_win";
+	public static final String DEFEAT = "nosferatu_defeat";
 	
 	
 	/**
@@ -40,7 +43,7 @@ public class GameBoard
 		this.clock = new ArrayList<String>();
 		this.discard = new ArrayList<String>();
 		this.library = new ArrayList<String>();
-		
+		this.biteCount = 0;
 	}
 	
 	/**
@@ -137,5 +140,18 @@ public class GameBoard
 			this.library.add(this.discard.remove(i));
 		}
 		this.shuffle(this.library);
+	}
+
+	/**
+	 * To be called whenever a Vampire plays a bite card
+	 */
+	public void bite()
+	{
+		this.biteCount++;
+	}
+	
+	public int getBiteCount()
+	{
+		return this.biteCount;
 	}
 }
