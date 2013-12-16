@@ -16,7 +16,7 @@ public class GameBoard
 	 */
 	public static final int MAX_CLOCK_SIZE = 6;
 	public static final int MAX_LIBRARY_SIZE = 54; 
-	public static final String RENFILED = "nosferatu_renfield";
+	public static final String RENFIELD = "nosferatu_renfield";
 	public static final String VAMPIRE = "nosferatu_vampire";
 	public static final String HUNTER = "nosferatu_hunter";	
 	public static final String DAWN = "nosferatu_dawn"; // 1

@@ -63,6 +63,11 @@ public class GameSrv
 					String msg = "ONLINE_PLAYER=";
 					msg += getPlayerCount();
 					this.sendToAll(msg);
+					
+					/*
+					 * REMOVE THIS LINE
+					 */
+					this.definePlayerRoles();
 				}else
 				{
 					System.out.println("Server is full -> rejecting.");
@@ -139,18 +144,46 @@ public class GameSrv
 			players[j] = players[i];
 		}
 		
-//		Assign roles
+//		Assign roles & send them to client
+		DataOutputStream dOut = null;
 		Player p = null;
-		temp = (Player)players[0];
-		p.setRole(GameBoard.RENFILED);
+		p = (Player)players[0];
+		p.setRole(GameBoard.RENFIELD);
+		dOut = this.outputs.get(p);
+		try
+		{
+			dOut.writeUTF(GameBoard.RENFIELD);
+		} catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		temp = (Player)players[1];
+		p = (Player)players[1];
 		p.setRole(GameBoard.VAMPIRE);
+		dOut = this.outputs.get(p);
+		try
+		{
+			dOut.writeUTF(GameBoard.VAMPIRE);
+		} catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		for(int i = 2; i < n; i++)
 		{
-			temp = (Player)players[i];
+			p = (Player)players[i];
 			p.setRole(GameBoard.HUNTER);
+			dOut = this.outputs.get(p);
+			try
+			{
+				dOut.writeUTF(GameBoard.HUNTER);
+			} catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
