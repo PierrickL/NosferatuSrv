@@ -7,6 +7,7 @@ public class Player
 	private Socket socket;
 	private String role;
 	private String name;
+	private String vampireName;
 	
 	public Player(Socket s)
 	{
@@ -27,6 +28,14 @@ public class Player
 	public String getName()
 	{
 		return this.name;
+	}
+	
+	public void setVampireName(String vampireName) {
+		this.vampireName = vampireName;
+	}
+	
+	public String getVampireName() {
+		return this.vampireName;
 	}
 	
 	public String getRole()

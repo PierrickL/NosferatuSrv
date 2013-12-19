@@ -57,14 +57,41 @@ public class GameServerThread extends Thread
 					
 				}
 				// Examinating all the cases : Requests from client
+				if(msg.contains("PA_ASKROLE")) {
+					try
+					{
+						this.dOut.writeUTF(p.getRole());
+						msg = input.readUTF();
+						System.out.println(s.getInetAddress().toString() + " : " + msg);
+						if(msg.equals("PA_CONFIRM")) {
+							if(p.getRole().equals(GameBoard.RENFIELD)) {
+								this.dOut.writeUTF("VAMPIRE_IS:" + srv.getVampire().getName());
+								msg = input.readUTF();
+							}
+							else {
+								playerDraw();
+								msg = input.readUTF();
+								playerDraw();
+								msg = input.readUTF();
+							}
+						}
+						srv.waitForFirstTurn();
+					} catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
 				if(msg.contains(GameBoard.DRAW))
 				{
 					playerDraw();
 				}
+				
 				if(msg.contains(GameBoard.KILL))
 				{
 					String toBeKilled = msg.split("=")[1];
-					String role = this.srv.getRoleByName(toBeKilled);
+					String role = this.srv.getPlayerByName(toBeKilled).getRole();
 					
 					if(role.equals(GameBoard.VAMPIRE))
 					{
@@ -105,14 +132,19 @@ public class GameServerThread extends Thread
 	private void playerDraw()
 	{
 		GameBoard b = srv.getGameBorBoard();
-		String cards[] = b.drawFromLibrary();
+		String card = b.drawFromLibrary();
+		System.out.println(card);
 		try
 		{
-			this.dOut.writeUTF(cards[0]+";"+cards[1]);
+			this.dOut.writeUTF(card);
 		} catch (IOException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private void setPlayerRole(String role) {
+		p.setRole(role);
 	}
 }

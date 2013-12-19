@@ -1,5 +1,6 @@
 package gameServer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 
@@ -44,6 +45,7 @@ public class GameBoard
 		this.discard = new ArrayList<String>();
 		this.library = new ArrayList<String>();
 		this.biteCount = 0;
+		init();
 	}
 	
 	/**
@@ -86,7 +88,8 @@ public class GameBoard
 	 */
 	private void shuffle(ArrayList<String>array)
 	{
-		int n = array.size();
+		Collections.shuffle(array);
+		/*int n = array.size();
 		Random r = new Random();
 		int j;
 		String temp;
@@ -96,7 +99,7 @@ public class GameBoard
 			temp = array.remove(i);
 			array.add(i, array.remove(j));
 			array.add(j,temp);
-		}
+		}*/
 	}
 	
 	/**
@@ -112,10 +115,10 @@ public class GameBoard
 	 * Draws 2 cards from the library
 	 * @return an array of 2 string symbolizing the 2 cards
 	 */
-	public String[] drawFromLibrary()
+	public String drawFromLibrary()
 	{
-		String cards[] = new String[2];
-		if(this.library.size() < 2)
+		String card;
+		if(this.library.size() < 1)
 		{
 			//not enough cards ; merge library & discard
 			this.mergeDiscardAndLibrary();
@@ -123,9 +126,8 @@ public class GameBoard
 		/*
 		 * Taking the two cards from the top of the library
 		 */
-		cards[0] = this.library.remove(this.library.size()-1);
-		cards[1] = this.library.remove(this.library.size()-1);
-		return cards;
+		card = this.library.remove(this.library.size()-1);
+		return card;
 	}
 	
 	/**

@@ -16,6 +16,9 @@ public class GameSrv
 	//private HashMap<Socket, DataOutputStream> outputs;
 	private HashMap<Player, DataOutputStream> outputs;
 	private GameBoard board;
+	private int confirm;
+	private Player renfield;
+	private Player vampire;
 
 	public GameSrv()
 	{
@@ -35,6 +38,7 @@ public class GameSrv
 		}
 		System.out.println("Now listening on port " + this.port + ".");
 		this.board = new GameBoard();
+		this.confirm = 0;
 	}
 
 	/**
@@ -64,10 +68,19 @@ public class GameSrv
 					msg += getPlayerCount();
 					this.sendToAll(msg);
 					
+					try {
+						Thread.sleep(200);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					/*
-					 * REMOVE THIS LINE
+					 * REMOVE THESE LINES
 					 */
-					this.definePlayerRoles();
+					if(getPlayerCount() > 1) {
+						definePlayerRoles();
+						sendToAll("START_GAME");
+					}
 				}else
 				{
 					System.out.println("Server is full -> rejecting.");
@@ -103,6 +116,10 @@ public class GameSrv
 	public int getPlayerCount()
 	{
 		return this.outputs.size();
+	}
+	
+	public Player getVampire() {
+		return vampire;
 	}
 
 	public void sendToAll(String message)
@@ -141,50 +158,61 @@ public class GameSrv
 			j = r.nextInt(n-1);
 			temp = players[i];
 			players[i] = players[j];
-			players[j] = players[i];
+			players[j] = temp;
 		}
 		
-//		Assign roles & send them to client
+//		Assign roles
 		DataOutputStream dOut = null;
 		Player p = null;
 		p = (Player)players[0];
 		p.setRole(GameBoard.RENFIELD);
+		renfield = p;
+		System.out.println(p);
 		dOut = this.outputs.get(p);
-		try
+		/*try
 		{
 			dOut.writeUTF(GameBoard.RENFIELD);
 		} catch (IOException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		p = (Player)players[1];
 		p.setRole(GameBoard.VAMPIRE);
+		vampire = p;
 		dOut = this.outputs.get(p);
-		try
+		/*try
 		{
 			dOut.writeUTF(GameBoard.VAMPIRE);
 		} catch (IOException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		for(int i = 2; i < n; i++)
 		{
 			p = (Player)players[i];
 			p.setRole(GameBoard.HUNTER);
 			dOut = this.outputs.get(p);
-			try
+			/*try
 			{
 				dOut.writeUTF(GameBoard.HUNTER);
 			} catch (IOException e)
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 		}
+		
+		/*
+		 * tells Renfield Vampire Name
+		 */
+		Player pVampire = (Player)players[1];
+		renfield.setVampireName(pVampire.getName());
+		System.out.println("renfield : " + renfield.getName() + " | " + renfield);
+		System.out.println("vampire : " + vampire.getName() + " | " + vampire);
 	}
 	
 	/**
@@ -192,20 +220,42 @@ public class GameSrv
 	 * @param playerName
 	 * @return
 	 */
-	public String getRoleByName(String playerName)
+	public Player getPlayerByName(String playerName)
 	{
 		Set<Player> pSet= outputs.keySet();
-		String role = null;
 		for(Player p : pSet)
 		{
 			if(p.getName().equals(playerName))
 			{
-				role = p.getRole();
-				break;
+				return p;
 			}
 		}
-		
-		return role;
+		return null;
+	}
+	
+	public synchronized void waitForFirstTurn() {
+		System.out.println("kwoin");
+		confirm++;
+		if(confirm == getPlayerCount()) {
+			DataOutputStream dOut = this.outputs.get(renfield);
+			String msg = "WHO_FIRST_PLAYER";
+			Set<Player> pSet= outputs.keySet();
+			for(Player p : pSet)
+			{
+				if(!p.getName().equals(renfield.getName()))
+				{
+					msg += ";" + p.getName();
+				}
+			}
+			msg += ";kwoin;kwoin2"; // TO REMOVE!
+			System.out.println(msg);
+			try {
+				dOut.writeUTF(msg);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	
