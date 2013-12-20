@@ -11,13 +11,14 @@ public class GameServerThread extends Thread
 	//private Socket sock;
 	private Player p;
 	private DataOutputStream dOut;
-
+	private boolean turn;
 	
 	//public GameServerThread(GameSrv srv,Socket s)
 	public GameServerThread(GameSrv srv,Player p)
 	{
 //		this.sock = s;
 		this.p = p;
+		p.setThread(this);
 		this.srv = srv;
 		Socket sock;
 		sock = p.getSocket();
@@ -32,6 +33,7 @@ public class GameServerThread extends Thread
 				return;
 			
 		}
+		this.turn = false;
 		this.start();
 	}
 	
@@ -75,43 +77,108 @@ public class GameServerThread extends Thread
 								msg = input.readUTF();
 							}
 						}
-						srv.waitForFirstTurn();
+						srv.waitForFirstTurn(p.getName());
 					} catch (IOException e)
 					{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-				
+				if(msg.contains("PA_FIRSTPLAYER")) {
+					srv.setTurn(msg.split(":")[1]);
+					srv.manageTurn();
+				}
+				if(msg.contains("PA_CARD_RENFIELD")) {
+					String cardForRenfield = msg.split(":")[1];
+					if(cardForRenfield.equals("BITE")) {
+						srv.addRenfieldCard(GameBoard.BITE, p.getName());
+					}
+					else if(cardForRenfield.equals("GOSSIP")) {
+						srv.addRenfieldCard(GameBoard.RUMOR, p.getName());
+					}
+					else if(cardForRenfield.equals("COMPONENT")) {
+						srv.addRenfieldCard(GameBoard.COMPONENT, p.getName());
+					}
+					else if(cardForRenfield.equals("NIGHT")) {
+						srv.addRenfieldCard(GameBoard.NIGHT, p.getName());
+					}
+					try
+					{
+						this.dOut.writeUTF("ASK_CARD_DISCARD");
+						System.out.println("ASK_CARD_DISCARD");
+					} catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				if(msg.contains("PA_CARD_DISCARD")) {
+					String cardForRenfield = msg.split(":")[1];
+					if(cardForRenfield.equals("BITE")) {
+						srv.addDiscardCard(GameBoard.BITE, p.getName());
+					}
+					else if(cardForRenfield.equals("GOSSIP")) {
+						srv.addDiscardCard(GameBoard.RUMOR, p.getName());
+					}
+					else if(cardForRenfield.equals("COMPONENT")) {
+						srv.addDiscardCard(GameBoard.COMPONENT, p.getName());
+					}
+					else if(cardForRenfield.equals("NIGHT")) {
+						srv.addDiscardCard(GameBoard.NIGHT, p.getName());
+					}
+					
+				}
+				if(msg.equals("PA_CONFIRM_NEXT_TURN")) {
+					srv.waitForNextTurn(p.getName());
+				}
 				if(msg.contains(GameBoard.DRAW))
 				{
 					playerDraw();
 				}
-				
-				if(msg.contains(GameBoard.KILL))
-				{
-					String toBeKilled = msg.split("=")[1];
-					String role = this.srv.getPlayerByName(toBeKilled).getRole();
-					
-					if(role.equals(GameBoard.VAMPIRE))
-					{
-						///TODO : Hunters win
-						String winMSG;
-						winMSG = GameBoard.VICTORY + ";" + GameBoard.HUNTER;
-						this.srv.sendToAll(winMSG);
+				if(msg.equals("END_DRAW")) {
+					if(turn) {
+						try
+						{
+							this.dOut.writeUTF("ASK_CARD_RENFIELD");
+						} catch (IOException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
-				if(msg.contains("PA_BITE"))
-				{
-					GameBoard b = this.srv.getGameBorBoard();
-					b.bite();
-					if(b.getBiteCount() >= 5)
-					{
-						// Vampires win
-						String winMSG;
-						winMSG = GameBoard.VICTORY + ";" + GameBoard.VAMPIRE;
-						this.srv.sendToAll(winMSG);
-					}
+				
+				if(msg.contains("PA_MAGIC")) {
+					String magic = msg.split(":")[1];
+					srv.resolveMagic(magic);
+				}
+				
+				if(msg.contains("PA_TARGET_BITTEN")) {
+					String target = msg.split(":")[1];
+					srv.resolveBite(target);
+				}
+				
+				if(msg.contains("PA_CONFIRM_END_TURN")) {
+					srv.waitForEndTurn(p.getName());
+				}
+				
+				if(msg.contains("PA_CONFIRM_CLOCK")) {
+					srv.waitForResolveCards(p.getName());
+				}
+				
+				if(msg.contains("PA_TARGET_IDENTITY")) {
+					String target = msg.split(":")[1];
+					srv.reveal(target);
+				}
+				
+				if(msg.contains("PA_TARGET_TRANSFUSION")) {
+					String target = msg.split(":")[1];
+					srv.transfuse(target);
+				}
+				
+				if(msg.contains("PA_TARGET_KILL")) {
+					String target = msg.split(":")[1];
+					srv.kill(target);
 				}
 			}
 		} catch (IOException e)
@@ -127,7 +194,7 @@ public class GameServerThread extends Thread
 	}
 	
 	/**
-	 * Executes game mechanism linked to the action of drawing 2 cards & sends the cards to the player
+	 * Executes game mechanism linked to the action of drawing a card & sends the cards to the player
 	 */
 	private void playerDraw()
 	{
@@ -146,5 +213,9 @@ public class GameServerThread extends Thread
 	
 	private void setPlayerRole(String role) {
 		p.setRole(role);
+	}
+	
+	public void setTurn(boolean turn) {
+		this.turn = turn;
 	}
 }

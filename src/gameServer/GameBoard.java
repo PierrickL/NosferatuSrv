@@ -10,6 +10,7 @@ public class GameBoard
 	private ArrayList<String> discard; //défausse
 	private ArrayList<String> library; //pioche
 	private int biteCount;
+	private int addNight;
 	
 	/*
 	 * Game constants
@@ -45,6 +46,7 @@ public class GameBoard
 		this.discard = new ArrayList<String>();
 		this.library = new ArrayList<String>();
 		this.biteCount = 0;
+		this.addNight = 0;
 		init();
 	}
 	
@@ -86,7 +88,7 @@ public class GameBoard
 	/**
 	 * Shuffles the cards
 	 */
-	private void shuffle(ArrayList<String>array)
+	public void shuffle(ArrayList<String>array)
 	{
 		Collections.shuffle(array);
 		/*int n = array.size();
@@ -112,8 +114,8 @@ public class GameBoard
 	}
 	
 	/**
-	 * Draws 2 cards from the library
-	 * @return an array of 2 string symbolizing the 2 cards
+	 * Draws a card from the library
+	 * @return a string symbolizing the card
 	 */
 	public String drawFromLibrary()
 	{
@@ -143,17 +145,51 @@ public class GameBoard
 		}
 		this.shuffle(this.library);
 	}
+	
+	public String drawFromClock() {
+		return this.clock.remove(clock.size()-1);
+	}
+	
+	public void reinitClock() {
+		clock = new ArrayList<String>();
+		for(int i=0; i<MAX_CLOCK_SIZE-1+addNight;i++) {
+			clock.add(NIGHT);
+		}
+		clock.add(DAWN);
+		shuffle(clock);
+	}
+	
+	public void addNightInClock(int n) {
+		addNight += n;
+		int k=0;
+		while(n > 0) {
+			for(int i=k; i<library.size(); i++) {
+				if(library.get(i).equals(NIGHT)) {
+					k=i;
+					library.remove(k);
+				}
+			} 
+		}
+	}
+	
+	public void removeNightInClock() {
+		addNight--;
+	}
 
 	/**
 	 * To be called whenever a Vampire plays a bite card
 	 */
-	public void bite()
+	public void bite(int n)
 	{
-		this.biteCount++;
+		this.biteCount += n;
 	}
 	
 	public int getBiteCount()
 	{
 		return this.biteCount;
+	}
+	
+	public void addDiscard(String card) {
+		discard.add(card);
 	}
 }
