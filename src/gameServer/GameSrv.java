@@ -95,7 +95,7 @@ public class GameSrv
 						e.printStackTrace();
 					}
 					
-					if(getPlayerCount() == 4) {
+					if(getPlayerCount() == 5) {
 						definePlayerRoles();
 						sendToAll("START_GAME");
 					}
@@ -310,6 +310,7 @@ public class GameSrv
 		if(!names.contains(name)) {
 			names.add(name);
 			confirm++;
+			System.out.println(confirm);
 			if(confirm == getPlayerCount()) {
 				confirm = 0;
 				names = new ArrayList<String>();
@@ -424,7 +425,9 @@ public class GameSrv
 				nights++;
 			}
 		}
+		System.out.println("cards analysed");
 		board.addNightInClock(nights);
+		System.out.println("nights added");
 		if(components == renfieldCards.size()) {
 			sendToAll("MAGIC_OCCURS");
 			DataOutputStream dOut = this.outputs.get(this.firstPlayer);
@@ -432,7 +435,7 @@ public class GameSrv
 			if(!identity) {
 				msg += ";identity";
 			}
-			if(!transfusion) {
+			if(!transfusion && board.getBiteCount() > 0) {
 				msg += ";transfusion";
 			}
 			if(!removeNight) {
@@ -460,9 +463,7 @@ public class GameSrv
 				{
 					if(!p.getName().equals(renfield.getName()))
 					{
-						if(vampire.getName() != p.getName()) {
-							msg += ";" + p.getName();
-						}
+						msg += ";" + p.getName();
 					}
 				}
 				System.out.println(msg);
@@ -628,7 +629,7 @@ public class GameSrv
 				sendToAll("HUNTERS_WIN");
 			}
 			else {
-				sendToAll("VAMPIRE_SECOND_WIN: + target");
+				sendToAll("VAMPIRE_SECOND_WIN:" + target);
 			}
 		}
 	}

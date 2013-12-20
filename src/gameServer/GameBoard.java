@@ -167,6 +167,7 @@ public class GameBoard
 				if(library.get(i).equals(NIGHT)) {
 					k=i;
 					library.remove(k);
+					n--;
 				}
 			} 
 		}
